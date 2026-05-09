@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 马星煜个人主页
 
-## Getting Started
+一个面向个人展示、项目沉淀和访客交流的 Next.js 作品集网站。视觉方向为藏蓝文字、低饱和色调、玻璃材质、留白充分、轻动效，重点突出数学、AI、前端、机器视觉与音乐制作的个人坐标。
 
-First, run the development server:
+## 页面结构
+
+- 首页首屏：个人姓名、头像、核心表达、联系入口、项目入口
+- 关于我：研究生身份、数学兴趣、技术方向与生活兴趣
+- 能力矩阵：AI 开发、前端开发、数学建模、机器视觉、音乐制作
+- 项目展示：机器学习、前端设计、机器视觉、数学建模、AI 开发
+- 做事方式：问题定义、结构建立、反馈验证
+- 留言板：留言提交、字数提示、状态提示、留言列表
+- 主题切换：右上角亮色 / 暗色主题按钮
+- 可访问性：主导航标签、跳过导航链接、可见焦点、动效降级
+
+## 技术栈
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4 / CSS Variables
+- Framer Motion
+- next-themes
+- Vitest
+- Testing Library
+
+## 本地运行
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 `http://localhost:3000`。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 测试与质量检查
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run test
+npm run test:coverage
+npm run build
+npm run check
+```
 
-## Learn More
+## 内容维护
 
-To learn more about Next.js, take a look at the following resources:
+主要内容集中在：
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+app/content.ts
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+页面结构集中在：
 
-## Deploy on Vercel
+```text
+app/page.tsx
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+视觉系统集中在：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+app/globals.css
+```
+
+主题切换组件：
+
+```text
+components/ThemeToggle.tsx
+```
