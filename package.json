@@ -37,6 +37,6 @@
   },
   "packageManager": "npm@10.5.2",
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   }
 }
