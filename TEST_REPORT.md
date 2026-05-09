@@ -1,31 +1,31 @@
 # 测试报告
 
-## 本轮变更
+## 本轮修改
 
-- 在首页首屏操作区新增 GitHub 入口，链接到 `https://github.com/xingyu8999`。
-- 在联系区新增 GitHub 联系卡片，并加入内联 GitHub SVG 图标。
-- 新增 `socialLinks` 内容数据，方便后续扩展个人主页、GitHub、博客或其他公开链接。
-- 更新测试，确保 GitHub 链接在内容数据和页面中都可被稳定访问。
-- 保留上一轮 Vercel 安装修复配置：固定 npm 安装链路，并使用 `npm ci --no-audit --no-fund`。
+- 首页主标题从 `用代码把想法落地。` 改为 `用代码把想法落地`。
+- 首次访问默认主题改为暗色模式：`defaultTheme="dark"`，并关闭系统主题跟随。
+- 手机端新增独立布局优化：
+  - 导航改为横向可滑动胶囊栏。
+  - 主题切换按钮在手机端改为右下角悬浮，避免遮挡导航和内容。
+  - 首屏、公式卡片、项目卡片、论文卡片、留言板和联系区重新调整间距、字号、圆角与按钮排布。
+- 修复项目区 JSX 中多余的 `</Reveal>`。
 
-## 已执行命令
+## 测试更新
 
-```bash
-npm run lint
-npm run test
-npm run test:coverage
-npm run build
-npm audit --audit-level=high --omit=dev
-```
+新增 / 更新测试断言：
 
-## 结果
+- 主标题不再包含中文句号。
+- 首次访问默认暗色主题。
+- 手机端存在独立导航与主题按钮布局规则。
 
-- ESLint：通过
-- Vitest：通过，4 个测试文件，23 个测试用例
-- Coverage：语句覆盖率 90.9%，行覆盖率 92.13%
-- Next.js build：通过
-- npm audit --audit-level=high --omit=dev：通过，无 high / critical 漏洞
+## 本地执行情况
 
-## 说明
+本轮在当前沙盒环境尝试安装依赖时，npm 访问公开 registry 出现 DNS 失败 / 安装无法完成，因此没有在沙盒内完成 `npm run lint`、`npm run test` 和 `npm run build` 的实际执行。
 
-`npm audit` 仍报告 Next.js 内部 PostCSS 链路存在 2 个 moderate 级别提示。未执行 `npm audit fix --force`，因为它会把 Next.js 降级到破坏性版本，不适合当前项目。
+已完成的静态校验：
+
+- `app/page.tsx` 已通过 TypeScript 解析阶段，未发现 JSX 语法错误。
+- `app/globals.css` 大括号平衡检查通过。
+- `package-lock.json` 未再包含内部 registry 地址。
+
+部署环境如果可以正常访问 `https://registry.npmjs.org/`，建议推送后在 Vercel 观察完整安装、测试和构建日志。

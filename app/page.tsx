@@ -359,7 +359,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.08 }}
             >
-              用代码把想法落地。
+              用代码把想法落地
             </motion.h1>
 
             <motion.p

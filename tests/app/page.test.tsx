@@ -12,6 +12,7 @@ describe("Home page", () => {
     render(<Home />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("用代码把想法落地");
+    expect(screen.queryByText("用代码把想法落地。")).not.toBeInTheDocument();
     expect(screen.getByText("马星煜")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "马星煜头像" })).toBeInTheDocument();
     expect(screen.getByText("星河有迹可循")).toBeInTheDocument();
