@@ -9,6 +9,7 @@ import {
   papers,
   projects,
   skills,
+  socialLinks,
 } from "@/app/content";
 
 describe("content model", () => {
@@ -95,6 +96,14 @@ describe("content model", () => {
   it("keeps method cards concise and formula-driven", () => {
     expect(methodCards).toHaveLength(3);
     expect(methodCards.every((card) => card.formula.includes("→") || card.formula.includes(">"))).toBe(true);
+  });
+
+  it("keeps the public GitHub link available as a social entry", () => {
+    expect(socialLinks).toHaveLength(1);
+    expect(socialLinks[0]).toMatchObject({
+      label: "GitHub",
+      href: "https://github.com/xingyu8999",
+    });
   });
 
   it("ships a clear default guestbook message", () => {

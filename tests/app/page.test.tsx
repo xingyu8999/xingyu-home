@@ -29,6 +29,8 @@ describe("Home page", () => {
     expect(screen.getByRole("heading", { name: "做事方式" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "留言板" })).toBeInTheDocument();
     expect(screen.getByText("一点勇气 一点耐心 一点毅力")).toBeInTheDocument();
+    const githubLinks = screen.getAllByRole("link", { name: /GitHub|github\.com\/xingyu8999|访问马星煜的 GitHub/ });
+    expect(githubLinks.some((link) => link.getAttribute("href") === "https://github.com/xingyu8999")).toBe(true);
   });
 
   it("renders the formula panel without garbled symbols and with an added line", () => {

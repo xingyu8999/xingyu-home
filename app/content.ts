@@ -8,6 +8,15 @@ export const navItems = [
   { label: "联系", href: "#contact" },
 ] as const;
 
+
+export const socialLinks = [
+  {
+    label: "GitHub",
+    href: "https://github.com/xingyu8999",
+    desc: "代码、实验和后续项目会陆续整理在这里。",
+  },
+] as const;
+
 export const skills = [
   {
     title: "AI 开发",

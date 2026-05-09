@@ -2,15 +2,11 @@
 
 ## 本轮变更
 
-- 调整重点论文期刊标签：`无线电工程 · 中文核心期刊` 改为 `无线电工程`。
-- 调整重点论文期刊标签：`激光与光电子学进展 · 62(13)` 改为 `激光与光电子学进展 · 62(13) · EI · CSCD`。
-- 论文区改为“两篇重点论文 + 其他论文缩略/展开”的信息结构。
-- 重点论文保留两篇：
-  - X射线荧光光谱结合MLP-DNN实现化妆品纸质包装盒快速分类
-  - 基于无人机平台的高速公路违法行为识别
-- 其他论文默认缩略展示，点击“展开其他论文”后显示完整条目、简介和可用链接。
-- 补充论文数据结构，支持期刊页面、DOI、知网页面等外链。
-- 修复重构时暴露出的项目数据缺失问题，并用测试锁定项目区结构。
+- 在首页首屏操作区新增 GitHub 入口，链接到 `https://github.com/xingyu8999`。
+- 在联系区新增 GitHub 联系卡片，并加入内联 GitHub SVG 图标。
+- 新增 `socialLinks` 内容数据，方便后续扩展个人主页、GitHub、博客或其他公开链接。
+- 更新测试，确保 GitHub 链接在内容数据和页面中都可被稳定访问。
+- 保留上一轮 Vercel 安装修复配置：固定 npm 安装链路，并使用 `npm ci --no-audit --no-fund`。
 
 ## 已执行命令
 
@@ -19,16 +15,16 @@ npm run lint
 npm run test
 npm run test:coverage
 npm run build
-npm audit --audit-level=high
+npm audit --audit-level=high --omit=dev
 ```
 
 ## 结果
 
 - ESLint：通过
-- Vitest：通过，4 个测试文件，22 个测试用例
-- Coverage：语句覆盖率 90.72%，行覆盖率 91.95%
+- Vitest：通过，4 个测试文件，23 个测试用例
+- Coverage：语句覆盖率 90.9%，行覆盖率 92.13%
 - Next.js build：通过
-- npm audit --audit-level=high：通过，无 high / critical 漏洞
+- npm audit --audit-level=high --omit=dev：通过，无 high / critical 漏洞
 
 ## 说明
 
