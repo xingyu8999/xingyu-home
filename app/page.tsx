@@ -359,7 +359,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.08 }}
             >
-              用代码把想法落地
+              用代码把想法落地。
             </motion.h1>
 
             <motion.p
@@ -396,7 +396,7 @@ export default function Home() {
               transition={{ duration: 0.76, ease, delay: 0.32 }}
             >
               <div><strong>05</strong><span>核心方向</span></div>
-              <div><strong>05</strong><span>项目方向</span></div>
+              <div><strong>{String(projects.length).padStart(2, "0")}</strong><span>项目方向</span></div>
               <div><strong>∞</strong><span>可交流主题</span></div>
             </motion.div>
           </div>

@@ -58,14 +58,20 @@ describe("content model", () => {
     }
   });
 
-  it("defines five ordered project cards for portfolio presentation", () => {
+  it("defines six ordered project cards for portfolio presentation", () => {
     expect(projects.map((project) => project.title)).toEqual([
+      "Elplayer",
       "机器学习方法实验",
       "前端设计系统",
       "机器视觉研究项目",
       "数学建模推导集",
       "AI 开发工作流",
     ]);
+
+    const elplayer = projects[0];
+    expect(elplayer.status).toBe("已发布");
+    expect(elplayer.links.map((link) => link.label)).toEqual(["项目介绍", "打开 Web 版", "下载桌面版", "GitHub"]);
+    expect(elplayer.links.every((link) => link.href.startsWith("https://"))).toBe(true);
 
     for (const project of projects) {
       expect(project.title).toBeTruthy();

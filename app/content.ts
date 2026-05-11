@@ -66,6 +66,23 @@ export type ProjectCard = {
 
 export const projects: ProjectCard[] = [
   {
+    code: "P-00",
+    title: "Elplayer",
+    type: "Electron / Web / Multimedia",
+    status: "已发布",
+    desc: "一个透明浮动歌词多媒体播放器，支持本地音频、本地视频、LRC 歌词、SRT/VTT 字幕、桌面歌词浮窗和极简黑胶机模式。",
+    focus: ["桌面歌词", "本地媒体", "视频字幕"],
+    stack: ["Electron", "HTML", "CSS", "JavaScript"],
+    evidence: "已完成 GitHub 仓库、GitHub Pages 展示页、下载页、Windows 桌面版打包流程和统一图标体系。",
+    result: "展示从 Web 原型到 Electron 桌面软件、官网发布页和真实安装包发布流程的完整落地能力。",
+    links: [
+      { label: "项目介绍", href: "https://xingyu8999.github.io/elplayer/website.html", kind: "demo" },
+      { label: "打开 Web 版", href: "https://xingyu8999.github.io/elplayer/", kind: "html" },
+      { label: "下载桌面版", href: "https://xingyu8999.github.io/elplayer/download.html", kind: "detail" },
+      { label: "GitHub", href: "https://github.com/xingyu8999/elplayer", kind: "github" },
+    ],
+  },
+  {
     code: "P-01",
     title: "机器学习方法实验",
     type: "Machine Learning / Research",

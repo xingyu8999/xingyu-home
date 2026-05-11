@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#main-content">跳过导航，进入主要内容</a>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
           <ThemeToggle />
         </ThemeProvider>

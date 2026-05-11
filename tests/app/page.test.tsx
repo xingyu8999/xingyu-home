@@ -12,7 +12,6 @@ describe("Home page", () => {
     render(<Home />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("用代码把想法落地");
-    expect(screen.queryByText("用代码把想法落地。")).not.toBeInTheDocument();
     expect(screen.getByText("马星煜")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: "马星煜头像" })).toBeInTheDocument();
     expect(screen.getByText("星河有迹可循")).toBeInTheDocument();
@@ -76,12 +75,19 @@ describe("Home page", () => {
 
     const projectHeadings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
     expect(projectHeadings).toEqual(expect.arrayContaining([
+      "Elplayer",
       "机器学习方法实验",
       "前端设计系统",
       "机器视觉研究项目",
       "数学建模推导集",
       "AI 开发工作流",
     ]));
+
+    const elplayerProject = screen.getByRole("heading", { name: "Elplayer" }).closest("article");
+    expect(elplayerProject).not.toBeNull();
+    expect(within(elplayerProject as HTMLElement).getByText("已发布")).toBeInTheDocument();
+    expect(within(elplayerProject as HTMLElement).getByRole("link", { name: /项目介绍/ })).toHaveAttribute("href", "https://xingyu8999.github.io/elplayer/website.html");
+    expect(within(elplayerProject as HTMLElement).getByRole("link", { name: /GitHub/ })).toHaveAttribute("href", "https://github.com/xingyu8999/elplayer");
 
     const mlProject = screen.getByRole("heading", { name: "机器学习方法实验" }).closest("article");
     expect(mlProject).not.toBeNull();
