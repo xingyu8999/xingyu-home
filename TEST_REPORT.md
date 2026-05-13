@@ -2,25 +2,45 @@
 
 ## 本轮变更
 
-- 在首页“项目展示”区新增 `Elplayer` 项目卡片，并将其置于项目列表首位，作为当前重点项目展示。
-- Elplayer 项目卡片包含项目介绍、Web 版、桌面版下载页和 GitHub 仓库四个公开入口。
-- 首页首屏“项目方向”数量由固定 `05` 调整为根据 `projects.length` 自动显示，当前为 `06`。
-- 更新内容模型测试和页面渲染测试，确保 Elplayer 项目、状态、链接和公开地址可被稳定校验。
+- 将答辩训练台从 `.html` 文件入口调整为二级路径入口：`/defense-training`。
+- 将独立页面文件移动到 `public/defense-training/index.html`，形成类似二级网站目录结构。
+- 首页首屏公式面板中的“星雨云答辩训练台”入口已改为跳转 `/defense-training`。
+- 在 `next.config.ts` 中新增 rewrite：访问 `/defense-training` 时展示 `public/defense-training/index.html`。
+- 在 `next.config.ts` 中新增 redirect：旧地址 `/defense-training.html` 会跳转到 `/defense-training`。
+- 更新页面测试中的入口地址断言。
 
-## 已执行命令
+## 本地检查
+
+已执行：
 
 ```bash
-npm run lint
-npm run test
-npm run build
+npm test -- --runInBand
 ```
 
 ## 结果
 
-- ESLint：通过
-- Vitest：通过，4 个测试文件，23 个测试用例
-- Next.js build：通过
+当前压缩包内没有 `node_modules`，因此本地环境无法直接运行 Vitest：
 
-## 说明
+```bash
+sh: 1: vitest: not found
+```
 
-当前环境 Node.js 版本为 v22.16.0，项目 `package.json` 指定 Node 20.x，因此 `npm install` 会出现 `EBADENGINE` 警告。该警告不影响本轮测试和构建结果；部署到 Vercel 时仍建议保持 Node 20.x。
+代码层面已完成静态检查：
+
+- 首页入口引用已从 `/defense-training.html` 改为 `/defense-training`。
+- 新的二级目录 HTML 文件存在于 `public/defense-training/index.html`。
+- 旧 `.html` 路径保留重定向规则，避免旧链接失效。
+
+## 部署后访问
+
+部署到 Vercel 后，推荐访问：
+
+```text
+https://maxingyu.cn/defense-training
+```
+
+旧地址会跳转到新地址：
+
+```text
+https://maxingyu.cn/defense-training.html
+```

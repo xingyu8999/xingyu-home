@@ -36,7 +36,7 @@ describe("Home page", () => {
   it("renders the formula panel without garbled symbols and with an added line", () => {
     render(<Home />);
 
-    expect(screen.getByText("f(world) = logic x patience")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "打开星雨云答辩训练台" })).toHaveAttribute("href", "/defense-training");
     expect(screen.getByText("loss = signal - noise")).toBeInTheDocument();
     expect(screen.getByText("clean code > stable system")).toBeInTheDocument();
     expect(screen.getByText("music ≈ structure + emotion")).toBeInTheDocument();
