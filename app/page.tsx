@@ -61,7 +61,6 @@ function GitHubIcon() {
 
 function FormulaPanel() {
   const lines = [
-    "f(world) = logic x patience",
     "loss = signal - noise",
     "clean code > stable system",
     "music ≈ structure + emotion",
@@ -82,14 +81,29 @@ function FormulaPanel() {
         <span />
       </div>
       <div className="formula-grid">
+        <motion.a
+          className="formula-entry"
+          href="/xyy-defense-training"
+          target="_blank"
+          rel="noreferrer"
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease, delay: 0.36 }}
+          aria-label="打开星雨云答辩训练台"
+        >
+          <span aria-hidden="true">01</span>
+          <strong>星雨云答辩训练台</strong>
+          <em>点击打开</em>
+          <ArrowIcon />
+        </motion.a>
         {lines.map((line, index) => (
           <motion.p
             key={line}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease, delay: 0.36 + index * 0.1 }}
+            transition={{ duration: 0.5, ease, delay: 0.46 + index * 0.1 }}
           >
-            <span aria-hidden="true">0{index + 1}</span>
+            <span aria-hidden="true">0{index + 2}</span>
             {line}
           </motion.p>
         ))}
