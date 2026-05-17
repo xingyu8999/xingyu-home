@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { ChangeEvent, CSSProperties, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import { motion, useScroll, useSpring } from "framer-motion";
 import {
   defaultMessages,
   lifeTags,
   methodCards,
+  motionPrinciples,
   navItems,
   archivedPapers,
   featuredPapers,
@@ -220,6 +221,27 @@ function PaperArchive() {
   );
 }
 
+function MotionPrinciples() {
+  return (
+    <div className="motion-lab-grid">
+      {motionPrinciples.map((item, index) => (
+        <Reveal delay={index * 0.06} key={item.title}>
+          <motion.article
+            className="glass-card motion-lab-card"
+            whileHover={{ y: -6, rotate: index === 1 ? -0.35 : 0.35 }}
+            transition={{ duration: 0.28, ease }}
+          >
+            <span>0{index + 1}</span>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
+            <code>{item.pattern}</code>
+          </motion.article>
+        </Reveal>
+      ))}
+    </div>
+  );
+}
+
 function Guestbook() {
   const [messages, setMessages] = useState<GuestbookMessage[]>(defaultMessages);
   const [contentLength, setContentLength] = useState(0);
@@ -331,9 +353,32 @@ function Guestbook() {
 
 export default function Home() {
   const year = useMemo(() => new Date().getFullYear(), []);
+  const { scrollYProgress } = useScroll();
+  const progressScale = useSpring(scrollYProgress, { stiffness: 110, damping: 28, restDelta: 0.001 });
+  const [spotlight, setSpotlight] = useState({ x: 0, y: 0, active: false });
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    function handlePointerMove(event: PointerEvent) {
+      setSpotlight({ x: event.clientX, y: event.clientY, active: true });
+    }
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    return () => window.removeEventListener("pointermove", handlePointerMove);
+  }, []);
+
+  const spotlightStyle = {
+    "--spotlight-x": `${spotlight.x}px`,
+    "--spotlight-y": `${spotlight.y}px`,
+    opacity: spotlight.active ? 1 : 0,
+  } as CSSProperties;
 
   return (
     <main id="main-content">
+      <motion.div className="page-progress" style={{ scaleX: progressScale }} aria-hidden="true" />
+      <div className="interactive-spotlight" style={spotlightStyle} aria-hidden="true" />
       <div className="site-shell">
         <motion.nav
           className="top-nav glass-card"
@@ -391,16 +436,16 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.24 }}
             >
-              <a className="primary-button" href="#projects">
+              <motion.a className="primary-button" href="#projects" whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 查看项目 <ArrowIcon />
-              </a>
-              <a className="secondary-button" href="mailto:mxyppusc@foxmail.com">
+              </motion.a>
+              <motion.a className="secondary-button" href="mailto:mxyppusc@foxmail.com" whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 发邮件交流
-              </a>
-              <a className="github-button" href={socialLinks[0].href} target="_blank" rel="noreferrer" aria-label="打开马星煜的 GitHub 主页">
+              </motion.a>
+              <motion.a className="github-button" href={socialLinks[0].href} target="_blank" rel="noreferrer" aria-label="打开马星煜的 GitHub 主页" whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <GitHubIcon />
                 GitHub
-              </a>
+              </motion.a>
             </motion.div>
 
             <motion.div
@@ -412,6 +457,19 @@ export default function Home() {
               <div><strong>05</strong><span>核心方向</span></div>
               <div><strong>{String(projects.length).padStart(2, "0")}</strong><span>项目方向</span></div>
               <div><strong>∞</strong><span>可交流主题</span></div>
+            </motion.div>
+
+            <motion.div
+              className="motion-strip"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.76, ease, delay: 0.4 }}
+              aria-label="站点动效关键词"
+            >
+              <span>Load-in</span>
+              <span>Scroll reveal</span>
+              <span>Hover feedback</span>
+              <span>Reduced-motion safe</span>
             </motion.div>
           </div>
           <FormulaPanel />
@@ -480,6 +538,7 @@ export default function Home() {
                     <span>{project.code}</span>
                     <small>{project.type}</small>
                   </div>
+                  <div className="project-card-glow" aria-hidden="true" />
                   <h3>{project.title}</h3>
                   <p>{project.desc}</p>
                   <div className="project-status">
@@ -547,6 +606,17 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
+        </section>
+
+        <section id="motion" className="content-section motion-lab-section">
+          <Reveal>
+            <SectionTitle
+              eyebrow="MOTION"
+              title="动效升级策略"
+              desc="把 Behance 上常见的开场欢迎、卡片反馈和滚动叙事转译成适合个人站的轻量交互。"
+            />
+          </Reveal>
+          <MotionPrinciples />
         </section>
 
         <section className="content-section quote-band" aria-label="个人表达">

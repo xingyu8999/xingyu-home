@@ -4,6 +4,7 @@ export const navItems = [
   { label: "项目", href: "#projects" },
   { label: "论文", href: "#papers" },
   { label: "方法", href: "#method" },
+  { label: "动效", href: "#motion" },
   { label: "留言", href: "#guestbook" },
   { label: "联系", href: "#contact" },
 ] as const;
@@ -279,6 +280,25 @@ export const methodCards = [
     title: "最后验证反馈",
     desc: "用测试、复盘和真实使用反馈持续迭代，让作品经得起长期维护。",
     formula: "feedback → iteration",
+  },
+] as const;
+
+
+export const motionPrinciples = [
+  {
+    title: "开场有欢迎感",
+    desc: "首屏采用分层入场、轻量进度线和柔和光斑，让访客先感到页面是活的，再进入内容。",
+    pattern: "Page load / Staged reveal",
+  },
+  {
+    title: "卡片有反馈",
+    desc: "项目、论文和方法卡片保留克制玻璃质感，同时在悬停时给出位移、边框和高光反馈。",
+    pattern: "Hover lift / Micro feedback",
+  },
+  {
+    title: "滚动有节奏",
+    desc: "章节之间用滚动显现、信息条和局部浮动元素串联，避免作品集变成静态简历。",
+    pattern: "Scroll reveal / Narrative rhythm",
   },
 ] as const;
 
