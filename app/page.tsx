@@ -560,7 +560,9 @@ export default function Home() {
   ], []);
 
   useEffect(() => {
-    const targets = navItems.map((item) => document.querySelector(item.href)).filter(Boolean);
+    const targets = navItems
+      .map((item) => document.querySelector(item.href))
+      .filter((target): target is Element => target !== null);
     const observer = new IntersectionObserver((entries) => {
       const visible = entries
         .filter((entry) => entry.isIntersecting)
