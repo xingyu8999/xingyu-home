@@ -1,11 +1,9 @@
 export const navItems = [
   { label: "关于", href: "#about" },
   { label: "能力", href: "#skills" },
-  { label: "体验", href: "#system" },
   { label: "项目", href: "#projects" },
   { label: "论文", href: "#papers" },
   { label: "方法", href: "#method" },
-  { label: "动效", href: "#motion" },
   { label: "留言", href: "#guestbook" },
   { label: "联系", href: "#contact" },
 ] as const;
@@ -16,24 +14,6 @@ export const socialLinks = [
     label: "GitHub",
     href: "https://github.com/xingyu8999",
     desc: "代码、实验和后续项目会陆续整理在这里。",
-  },
-] as const;
-
-export const quickActions = [
-  {
-    label: "打开 GitHub",
-    href: "https://github.com/xingyu8999",
-    desc: "查看代码、实验和项目更新",
-  },
-  {
-    label: "星雨云答辩训练台",
-    href: "/xyy-defense-training",
-    desc: "打开已发布的静态项目页面",
-  },
-  {
-    label: "发送邮件",
-    href: "mailto:mxyppusc@foxmail.com",
-    desc: "发起技术交流或项目合作",
   },
 ] as const;
 
@@ -299,72 +279,6 @@ export const methodCards = [
     title: "最后验证反馈",
     desc: "用测试、复盘和真实使用反馈持续迭代，让作品经得起长期维护。",
     formula: "feedback → iteration",
-  },
-] as const;
-
-
-export const experienceSteps = [
-  {
-    title: "建立第一印象",
-    desc: "首屏用一句清晰定位、个人头像、数字指标和动态视觉面板，先回答“你是谁、能做什么”。",
-  },
-  {
-    title: "展示可信证据",
-    desc: "能力、项目和论文分层呈现，用可验证链接、研究记录和技术栈降低理解成本。",
-  },
-  {
-    title: "允许主动探索",
-    desc: "项目筛选、快速跳转、活跃导航和可展开论文归档，让访客按自己的目的浏览。",
-  },
-  {
-    title: "推动后续联系",
-    desc: "留言板、邮件、GitHub 与联系区形成闭环，让“看完”自然变成“交流”。",
-  },
-] as const;
-
-export const interactionSpecs = [
-  {
-    kicker: "STYLE",
-    title: "克制玻璃拟态 + 研究气质",
-    desc: "保留藏蓝、纸感、轻噪点和磨砂层，用更明确的高光、边框和排版比例提升高级感。",
-  },
-  {
-    kicker: "FLOW",
-    title: "从定位到证据的阅读路径",
-    desc: "首屏负责吸引，能力和体验系统解释方法，项目与论文给出证据，联系区完成转化。",
-  },
-  {
-    kicker: "MOTION",
-    title: "轻量动效而非炫技",
-    desc: "使用分层入场、悬停抬升、光斑跟随和滚动进度，让页面有手感但不影响可读性。",
-  },
-  {
-    kicker: "ACCESS",
-    title: "键盘与低动效友好",
-    desc: "保留跳过导航、可见焦点、快捷面板和 reduced-motion 兼容，交互升级不牺牲可访问性。",
-  },
-] as const;
-
-export const motionPrinciples = [
-  {
-    title: "开场有欢迎感",
-    desc: "首屏采用分层入场、轻量进度线和柔和光斑，让访客先感到页面是活的，再进入内容。",
-    pattern: "Page load / Staged reveal",
-  },
-  {
-    title: "导航有状态",
-    desc: "滚动时高亮当前章节，并提供 Command Palette 快速跳转，提升长页面的信息定位效率。",
-    pattern: "Active nav / ⌘K palette",
-  },
-  {
-    title: "卡片有反馈",
-    desc: "项目、论文和方法卡片保留克制玻璃质感，同时在悬停时给出位移、边框和高光反馈。",
-    pattern: "Hover lift / Micro feedback",
-  },
-  {
-    title: "滚动有节奏",
-    desc: "章节之间用滚动显现、信息条和局部浮动元素串联，避免作品集变成静态简历。",
-    pattern: "Scroll reveal / Narrative rhythm",
   },
 ] as const;
 

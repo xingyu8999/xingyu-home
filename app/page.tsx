@@ -1,29 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
-import {
-  ChangeEvent,
-  CSSProperties,
-  FormEvent,
-  KeyboardEvent as ReactKeyboardEvent,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   defaultMessages,
-  experienceSteps,
-  interactionSpecs,
   lifeTags,
   methodCards,
-  motionPrinciples,
   navItems,
   archivedPapers,
   featuredPapers,
   projects,
-  quickActions,
   skills,
   socialLinks,
   type GuestbookMessage,
@@ -33,8 +21,16 @@ import {
 const ease = [0.22, 1, 0.36, 1] as const;
 const guestbookStorageKey = "mxy-guestbook";
 const maxGuestbookMessages = 6;
-const projectFilterOptions = ["全部", "已发布", "AI", "研究", "前端", "建模"] as const;
-type ProjectFilter = (typeof projectFilterOptions)[number];
+const projectFilters = ["全部", "已发布", "AI", "研究", "前端", "建模"] as const;
+
+type ProjectFilter = (typeof projectFilters)[number];
+
+type PaletteItem = {
+  label: string;
+  hint: string;
+  href: string;
+  external?: boolean;
+};
 
 function SectionTitle({ eyebrow, title, desc }: { eyebrow: string; title: string; desc?: string }) {
   return (
@@ -46,14 +42,13 @@ function SectionTitle({ eyebrow, title, desc }: { eyebrow: string; title: string
   );
 }
 
-function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
+function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   return (
     <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 26, filter: "blur(8px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.72, ease, delay }}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-90px" }}
+      transition={{ duration: 0.68, ease, delay }}
     >
       {children}
     </motion.div>
@@ -76,148 +71,103 @@ function GitHubIcon() {
   );
 }
 
-function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [query, setQuery] = useState("");
-  const actions = useMemo(() => [
-    ...navItems.map((item) => ({ label: item.label, href: item.href, desc: "跳转到页面章节" })),
-    ...quickActions,
-  ], []);
-  const visibleActions = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    if (!needle) return actions;
-    return actions.filter((item) => `${item.label} ${item.desc}`.toLowerCase().includes(needle));
-  }, [actions, query]);
-
-  useEffect(() => {
-    if (open) setQuery("");
-  }, [open]);
-
+function SearchIcon() {
   return (
-    <AnimatePresence>
-      {open ? (
-        <motion.div
-          className="command-overlay"
-          role="presentation"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) onClose();
-          }}
-        >
-          <motion.div
-            className="command-panel glass-card"
-            role="dialog"
-            aria-modal="true"
-            aria-label="快速跳转面板"
-            initial={{ opacity: 0, y: 18, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.98 }}
-            transition={{ duration: 0.24, ease }}
-          >
-            <div className="command-head">
-              <span>Command Center</span>
-              <button type="button" onClick={onClose} aria-label="关闭快速跳转">Esc</button>
-            </div>
-            <input
-              autoFocus
-              value={query}
-              onChange={(event) => setQuery(event.currentTarget.value)}
-              placeholder="搜索章节、项目、联系方式..."
-              aria-label="搜索快速跳转项目"
-            />
-            <div className="command-list">
-              {visibleActions.map((item) => (
-                <a href={item.href} key={`${item.label}-${item.href}`} onClick={onClose}>
-                  <strong>{item.label}</strong>
-                  <span>{item.desc}</span>
-                  <ArrowIcon />
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
+      <path d="m16.5 16.5 4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
   );
 }
 
-function FormulaPanel() {
+function ScrollProgress() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    function updateProgress() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0);
+    }
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+    return () => {
+      window.removeEventListener("scroll", updateProgress);
+      window.removeEventListener("resize", updateProgress);
+    };
+  }, []);
+
+  return <span className="scroll-progress" style={{ transform: `scaleX(${progress})` }} aria-hidden="true" />;
+}
+
+function SignalPanel() {
   const lines = [
     "loss = signal - noise",
     "clean code > stable system",
     "music ≈ structure + emotion",
     "idea -> code -> reality",
   ];
-  const nodes = ["AI", "UI", "CV", "Math", "Sound"];
+
+  const signalTags = ["AI", "Front-end", "XRF", "CV", "Music"];
 
   return (
     <motion.aside
-      className="formula-panel glass-card hero-visual"
-      aria-label="个人关键词公式面板"
-      initial={{ opacity: 0, y: 18, rotate: 0.6 }}
+      className="signal-panel glass-card"
+      aria-label="个人关键词面板"
+      initial={{ opacity: 0, y: 20, rotate: 0.8 }}
       animate={{ opacity: 1, y: 0, rotate: 0 }}
-      transition={{ duration: 0.85, ease, delay: 0.18 }}
+      transition={{ duration: 0.82, ease, delay: 0.18 }}
     >
-      <div className="hero-visual-head">
-        <div className="window-dots" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-        <span>live interface</span>
+      <div className="window-dots" aria-hidden="true">
+        <span />
+        <span />
+        <span />
       </div>
 
-      <div className="orbit-system" aria-hidden="true">
-        <div className="orbit-core">MXY</div>
-        {nodes.map((node, index) => (
-          <span className={`orbit-node orbit-node-${index + 1}`} key={node}>{node}</span>
-        ))}
+      <div className="panel-orbit" aria-hidden="true">
+        <span className="orbit-ring orbit-ring-a" />
+        <span className="orbit-ring orbit-ring-b" />
+        <span className="orbit-core">MXY</span>
+        {signalTags.map((tag, index) => <span className={`orbit-chip orbit-chip-${index + 1}`} key={tag}>{tag}</span>)}
       </div>
 
-      <div className="signal-card">
-        <span>当前信号</span>
-        <strong>Research × Code × Motion</strong>
-        <p>把论文、项目、工具和生活质感统一到一个可浏览的系统里。</p>
-      </div>
+      <a
+        className="feature-link-card"
+        href="/xyy-defense-training"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="打开星雨云答辩训练台"
+      >
+        <span>Featured</span>
+        <strong>星雨云答辩训练台</strong>
+        <em>答辩场景 · 训练流程 · 即开即用</em>
+        <ArrowIcon />
+      </a>
 
-      <div className="formula-grid">
-        <motion.a
-          className="formula-entry"
-          href="/xyy-defense-training"
-          target="_blank"
-          rel="noreferrer"
-          initial={{ opacity: 0, x: -8 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, ease, delay: 0.36 }}
-          aria-label="打开星雨云答辩训练台"
-        >
-          <span aria-hidden="true">01</span>
-          <strong>星雨云答辩训练台</strong>
-          <em>点击打开</em>
-          <ArrowIcon />
-        </motion.a>
+      <div className="formula-list" aria-label="个人关键词公式">
         {lines.map((line, index) => (
           <motion.p
             key={line}
-            initial={{ opacity: 0, x: -8 }}
+            initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease, delay: 0.46 + index * 0.1 }}
+            transition={{ duration: 0.48, ease, delay: 0.38 + index * 0.08 }}
           >
-            <span aria-hidden="true">0{index + 2}</span>
-            {line}
+            <span>0{index + 1}</span>
+            <code>{line}</code>
           </motion.p>
         ))}
       </div>
-      <div className="orb orb-a" aria-hidden="true" />
-      <div className="orb orb-b" aria-hidden="true" />
+
+      <span className="panel-glow panel-glow-a" aria-hidden="true" />
+      <span className="panel-glow panel-glow-b" aria-hidden="true" />
     </motion.aside>
   );
 }
 
 function isGuestbookMessage(value: unknown): value is GuestbookMessage {
   if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<GuestbookMessage>;
+  const candidate = value as GuestbookMessage;
   return [candidate.id, candidate.name, candidate.topic, candidate.content, candidate.time].every((item) => typeof item === "string");
 }
 
@@ -317,152 +267,6 @@ function PaperArchive() {
           </div>
         </div>
       </Reveal>
-    </div>
-  );
-}
-
-function projectMatchesFilter(project: ProjectCard, filter: ProjectFilter) {
-  if (filter === "全部") return true;
-  if (filter === "已发布") return project.status.includes("发布");
-  if (filter === "AI") return `${project.title}${project.type}${project.stack.join("")}`.toLowerCase().includes("ai") || project.title.includes("AI");
-  if (filter === "研究") return project.type.includes("Research") || project.title.includes("视觉") || project.title.includes("机器学习");
-  if (filter === "前端") return project.type.includes("Frontend") || project.stack.includes("Next.js") || project.stack.includes("React");
-  if (filter === "建模") return project.title.includes("建模") || project.type.includes("Modeling");
-  return true;
-}
-
-function ProjectShowcase() {
-  const [activeFilter, setActiveFilter] = useState<ProjectFilter>("全部");
-  const visibleProjects = useMemo(() => projects.filter((project) => projectMatchesFilter(project, activeFilter)), [activeFilter]);
-
-  return (
-    <>
-      <div className="project-toolbar" aria-label="项目筛选">
-        {projectFilterOptions.map((option) => (
-          <button
-            type="button"
-            key={option}
-            aria-pressed={activeFilter === option}
-            onClick={() => setActiveFilter(option)}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
-      <div className="project-grid">
-        {visibleProjects.map((project, index) => (
-          <Reveal delay={index * 0.06} key={project.title}>
-            <ProjectCard project={project} index={index} />
-          </Reveal>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function ProjectCard({ project, index }: { project: ProjectCard; index: number }) {
-  const cardStyle = { "--project-hue": `${156 + index * 31}` } as CSSProperties;
-
-  return (
-    <motion.article
-      className="glass-card project-card"
-      style={cardStyle}
-      whileHover={{ y: -8, rotateX: 1, rotateY: index % 2 === 0 ? -1 : 1 }}
-      transition={{ duration: 0.28, ease }}
-    >
-      <div className="project-topline">
-        <span>{project.code}</span>
-        <small>{project.type}</small>
-      </div>
-      <div className="project-card-glow" aria-hidden="true" />
-      <h3>{project.title}</h3>
-      <p>{project.desc}</p>
-      <div className="project-status">
-        <span>{project.status}</span>
-        <span>{project.evidence}</span>
-      </div>
-      <div className="focus-list" aria-label={`${project.title}重点`}>
-        {project.focus.map((item) => <span key={item}>{item}</span>)}
-      </div>
-      <div className="stack-list" aria-label={`${project.title}技术栈`}>
-        {project.stack.map((item) => <code key={item}>{item}</code>)}
-      </div>
-      <div className="project-result">
-        <strong>展示重点</strong>
-        <p>{project.result}</p>
-      </div>
-      {project.links.length > 0 ? (
-        <div className="project-links" aria-label={`${project.title}相关链接`}>
-          {project.links.map((link) => (
-            <a
-              href={link.href}
-              key={`${project.title}-${link.label}`}
-              target={link.href.startsWith("#") ? undefined : "_blank"}
-              rel={link.href.startsWith("#") ? undefined : "noreferrer"}
-            >
-              {link.label} <ArrowIcon />
-            </a>
-          ))}
-        </div>
-      ) : null}
-    </motion.article>
-  );
-}
-
-function InterfaceSystem() {
-  return (
-    <div className="system-grid">
-      <Reveal className="system-map" delay={0.04}>
-        <div className="glass-card system-card system-card-large">
-          <div className="system-card-head">
-            <span>Experience Map</span>
-            <small>01 / 04</small>
-          </div>
-          <div className="experience-steps">
-            {experienceSteps.map((step, index) => (
-              <article key={step.title}>
-                <span>0{index + 1}</span>
-                <div>
-                  <strong>{step.title}</strong>
-                  <p>{step.desc}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-      <div className="system-specs">
-        {interactionSpecs.map((item, index) => (
-          <Reveal delay={0.08 + index * 0.05} key={item.title}>
-            <motion.article className="glass-card system-card spec-card" whileHover={{ y: -5 }} transition={{ duration: 0.24, ease }}>
-              <span>{item.kicker}</span>
-              <h3>{item.title}</h3>
-              <p>{item.desc}</p>
-            </motion.article>
-          </Reveal>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MotionPrinciples() {
-  return (
-    <div className="motion-lab-grid">
-      {motionPrinciples.map((item, index) => (
-        <Reveal delay={index * 0.06} key={item.title}>
-          <motion.article
-            className="glass-card motion-lab-card"
-            whileHover={{ y: -6, rotate: index % 2 ? -0.35 : 0.35 }}
-            transition={{ duration: 0.28, ease }}
-          >
-            <span>0{index + 1}</span>
-            <h3>{item.title}</h3>
-            <p>{item.desc}</p>
-            <code>{item.pattern}</code>
-          </motion.article>
-        </Reveal>
-      ))}
     </div>
   );
 }
@@ -576,95 +380,212 @@ function Guestbook() {
   );
 }
 
-function FloatingSectionRail({ activeSection }: { activeSection: string }) {
+function projectMatchesFilter(project: ProjectCard, filter: ProjectFilter) {
+  if (filter === "全部") return true;
+  const text = [project.title, project.type, project.status, project.desc, ...project.focus, ...project.stack].join(" ").toLowerCase();
+  const filterMap: Record<Exclude<ProjectFilter, "全部">, string[]> = {
+    已发布: ["已发布"],
+    AI: ["ai", "llm", "agent", "machine learning", "模型"],
+    研究: ["research", "实验", "研究", "论文", "evaluation"],
+    前端: ["frontend", "前端", "next.js", "react", "typescript", "ui"],
+    建模: ["modeling", "optimization", "建模", "优化", "simulation"],
+  };
+
+  return filterMap[filter].some((keyword) => text.includes(keyword.toLowerCase()));
+}
+
+function ProjectShowcase() {
+  const [activeFilter, setActiveFilter] = useState<ProjectFilter>("全部");
+  const visibleProjects = projects.filter((project) => projectMatchesFilter(project, activeFilter));
+
   return (
-    <div className="section-rail" aria-label="页面章节进度">
-      {navItems.map((item) => {
-        const sectionId = item.href.slice(1);
-        return (
-          <a
-            key={item.href}
-            href={item.href}
-            className={activeSection === sectionId ? "is-active" : undefined}
-            aria-label={`跳转到${item.label}`}
+    <div className="project-showcase">
+      <div className="project-filter-row" aria-label="项目筛选">
+        {projectFilters.map((filter) => (
+          <button
+            type="button"
+            key={filter}
+            aria-pressed={activeFilter === filter}
+            onClick={() => setActiveFilter(filter)}
           >
-            <span>{item.label}</span>
-          </a>
-        );
-      })}
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      <motion.div className="project-grid" layout>
+        {visibleProjects.map((project, index) => (
+          <Reveal delay={index * 0.05} key={project.title}>
+            <motion.article className="glass-card project-card" layout whileHover={{ y: -8 }} transition={{ duration: 0.22, ease }}>
+              <div className="project-topline">
+                <span>{project.code}</span>
+                <small>{project.type}</small>
+              </div>
+              <h3>{project.title}</h3>
+              <p>{project.desc}</p>
+              <div className="project-status">
+                <span>{project.status}</span>
+                <span>{project.evidence}</span>
+              </div>
+              <div className="focus-list" aria-label={`${project.title}重点`}>
+                {project.focus.map((item) => <span key={item}>{item}</span>)}
+              </div>
+              <div className="stack-list" aria-label={`${project.title}技术栈`}>
+                {project.stack.map((item) => <code key={item}>{item}</code>)}
+              </div>
+              <div className="project-result">
+                <strong>展示重点</strong>
+                <p>{project.result}</p>
+              </div>
+              {project.links.length > 0 ? (
+                <div className="project-links" aria-label={`${project.title}相关链接`}>
+                  {project.links.map((link) => (
+                    <a
+                      href={link.href}
+                      key={`${project.title}-${link.label}`}
+                      target={link.href.startsWith("#") ? undefined : "_blank"}
+                      rel={link.href.startsWith("#") ? undefined : "noreferrer"}
+                    >
+                      {link.label} <ArrowIcon />
+                    </a>
+                  ))}
+                </div>
+              ) : null}
+            </motion.article>
+          </Reveal>
+        ))}
+      </motion.div>
     </div>
   );
 }
 
-export default function Home() {
-  const year = useMemo(() => new Date().getFullYear(), []);
-  const { scrollYProgress } = useScroll();
-  const progressScale = useSpring(scrollYProgress, { stiffness: 110, damping: 28, restDelta: 0.001 });
-  const [spotlight, setSpotlight] = useState({ x: 0, y: 0, active: false });
-  const [activeSection, setActiveSection] = useState("top");
-  const [isCommandOpen, setIsCommandOpen] = useState(false);
-
-  useEffect(() => {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return;
-
-    function handlePointerMove(event: PointerEvent) {
-      setSpotlight({ x: event.clientX, y: event.clientY, active: true });
-    }
-
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    return () => window.removeEventListener("pointermove", handlePointerMove);
-  }, []);
+function CommandPalette({ items }: { items: PaletteItem[] }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      const key = event.key.toLowerCase();
-      if ((event.metaKey || event.ctrlKey) && key === "k") {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setIsCommandOpen((current) => !current);
+        setOpen((current) => !current);
       }
-      if (event.key === "Escape") setIsCommandOpen(false);
+
+      if (event.key === "Escape") setOpen(false);
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  useEffect(() => {
-    if (!("IntersectionObserver" in window)) return;
-    const ids = ["top", ...navItems.map((item) => item.href.slice(1))];
-    const sections = ids.map((id) => document.getElementById(id)).filter((section): section is HTMLElement => Boolean(section));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActiveSection(visible.target.id);
-      },
-      { rootMargin: "-28% 0px -58% 0px", threshold: [0.12, 0.24, 0.42] },
-    );
+  const filteredItems = items.filter((item) => {
+    const haystack = `${item.label} ${item.hint}`.toLowerCase();
+    return haystack.includes(query.toLowerCase());
+  });
 
-    sections.forEach((section) => observer.observe(section));
+  function visit(item: PaletteItem) {
+    setOpen(false);
+    setQuery("");
+    if (item.external) {
+      window.open(item.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    window.location.hash = item.href.replace(/^#/, "");
+  }
+
+  return (
+    <>
+      <button type="button" className="palette-trigger" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>
+        <SearchIcon />
+        <span>快速跳转</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      {open ? (
+        <motion.div className="palette-backdrop" role="presentation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div
+            className="command-palette glass-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="快速跳转"
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.22, ease }}
+          >
+            <div className="palette-search">
+              <SearchIcon />
+              <input autoFocus value={query} placeholder="搜索章节、项目或联系方式" onChange={(event) => setQuery(event.currentTarget.value)} />
+              <button type="button" onClick={() => setOpen(false)}>关闭</button>
+            </div>
+            <div className="palette-results">
+              {filteredItems.map((item) => (
+                <button type="button" key={`${item.label}-${item.href}`} onClick={() => visit(item)}>
+                  <span>{item.label}</span>
+                  <small>{item.hint}</small>
+                </button>
+              ))}
+              {filteredItems.length === 0 ? <p>没有匹配项。</p> : null}
+            </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </>
+  );
+}
+
+function SectionRail({ activeId }: { activeId: string }) {
+  return (
+    <aside className="section-rail" aria-label="页面章节进度">
+      {navItems.map((item) => {
+        const id = item.href.replace("#", "");
+        return (
+          <a href={item.href} key={item.href} aria-label={item.label} aria-current={activeId === id ? "true" : undefined}>
+            <span />
+          </a>
+        );
+      })}
+    </aside>
+  );
+}
+
+export default function Home() {
+  const year = useMemo(() => new Date().getFullYear(), []);
+  const [activeId, setActiveId] = useState(navItems[0].href.replace("#", ""));
+  const [spotlight, setSpotlight] = useState({ x: 0, y: 0 });
+
+  const paletteItems = useMemo<PaletteItem[]>(() => [
+    ...navItems.map((item) => ({ label: item.label, hint: "页面章节", href: item.href })),
+    { label: "星雨云答辩训练台", hint: "答辩训练入口", href: "/xyy-defense-training", external: true },
+    { label: "GitHub", hint: "代码与项目", href: socialLinks[0].href, external: true },
+    { label: "邮件", hint: "mxyppusc@foxmail.com", href: "mailto:mxyppusc@foxmail.com", external: true },
+  ], []);
+
+  useEffect(() => {
+    const targets = navItems.map((item) => document.querySelector(item.href)).filter(Boolean);
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible?.target.id) setActiveId(visible.target.id);
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: [0.08, 0.2, 0.42] });
+
+    targets.forEach((target) => observer.observe(target));
     return () => observer.disconnect();
   }, []);
 
-  function openCommand(event?: ReactKeyboardEvent<HTMLButtonElement>) {
-    if (event && event.key !== "Enter" && event.key !== " ") return;
-    setIsCommandOpen(true);
+  function handlePointerMove(event: PointerEvent<HTMLElement>) {
+    setSpotlight({ x: event.clientX, y: event.clientY });
   }
 
-  const spotlightStyle = {
-    "--spotlight-x": `${spotlight.x}px`,
-    "--spotlight-y": `${spotlight.y}px`,
-    opacity: spotlight.active ? 1 : 0,
-  } as CSSProperties;
-
   return (
-    <main id="main-content">
-      <motion.div className="page-progress" style={{ scaleX: progressScale }} aria-hidden="true" />
-      <div className="interactive-spotlight" style={spotlightStyle} aria-hidden="true" />
-      <FloatingSectionRail activeSection={activeSection} />
-      <CommandPalette open={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
+    <main id="main-content" onPointerMove={handlePointerMove}>
+      <ScrollProgress />
+      <div
+        className="site-spotlight"
+        style={{ "--spotlight-x": `${spotlight.x}px`, "--spotlight-y": `${spotlight.y}px` } as CSSProperties}
+        aria-hidden="true"
+      />
+      <SectionRail activeId={activeId} />
+
       <div className="site-shell">
         <motion.nav
           className="top-nav glass-card"
@@ -679,28 +600,13 @@ export default function Home() {
           </a>
           <div className="nav-links">
             {navItems.map((item) => {
-              const sectionId = item.href.slice(1);
+              const id = item.href.replace("#", "");
               return (
-                <a
-                  href={item.href}
-                  key={item.href}
-                  className={activeSection === sectionId ? "is-active" : undefined}
-                  aria-current={activeSection === sectionId ? "page" : undefined}
-                >
-                  {item.label}
-                </a>
+                <a href={item.href} key={item.href} aria-current={activeId === id ? "page" : undefined}>{item.label}</a>
               );
             })}
           </div>
-          <button
-            type="button"
-            className="command-button"
-            onClick={() => setIsCommandOpen(true)}
-            onKeyDown={openCommand}
-            aria-label="打开快速跳转面板"
-          >
-            <span>⌘K</span>
-          </button>
+          <CommandPalette items={paletteItems} />
         </motion.nav>
 
         <section id="top" className="hero-section">
@@ -714,18 +620,8 @@ export default function Home() {
               <Image src="/avatar.jpg" alt="马星煜头像" width={88} height={88} priority />
               <div>
                 <p>马星煜</p>
-                <span>AI Developer / Frontend Developer / Research Builder</span>
+                <span>AI Developer / Frontend Developer</span>
               </div>
-            </motion.div>
-
-            <motion.div
-              className="hero-superbar"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease, delay: 0.04 }}
-            >
-              <span>Portfolio 2026</span>
-              <span>Available for ideas & collaboration</span>
             </motion.div>
 
             <motion.h1
@@ -733,8 +629,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.08 }}
             >
-              <span className="hero-title-line">用代码把想法落地</span>
-              <span className="hero-title-line accent-line">让作品有逻辑，也有手感。</span>
+              用代码把想法落地
             </motion.h1>
 
             <motion.p
@@ -743,7 +638,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.16 }}
             >
-              我是马星煜，一名在读研究生。技术上主攻前端开发与 AI 开发，也关注数学建模、机器视觉与音乐制作。新版个人站以“研究可信度 + 产品级交互 + 轻量动效”为核心，把作品、论文和联系方式组织成更清晰的浏览路径。
+              我是马星煜，一名在读研究生。技术上主攻前端开发与 AI 开发，也关注数学建模、机器视觉与音乐制作。这里记录项目、论文、方法和一些真实可聊的兴趣。
             </motion.p>
 
             <motion.div
@@ -752,20 +647,20 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.24 }}
             >
-              <motion.a className="primary-button magnetic-button" href="#projects" whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <a className="primary-button" href="#projects">
                 查看项目 <ArrowIcon />
-              </motion.a>
-              <motion.a className="secondary-button magnetic-button" href="#papers" whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                阅读论文
-              </motion.a>
-              <motion.a className="github-button magnetic-button" href={socialLinks[0].href} target="_blank" rel="noreferrer" aria-label="打开马星煜的 GitHub 主页" whileHover={{ y: -3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              </a>
+              <a className="secondary-button" href="mailto:mxyppusc@foxmail.com">
+                发邮件交流
+              </a>
+              <a className="github-button" href={socialLinks[0].href} target="_blank" rel="noreferrer" aria-label="打开马星煜的 GitHub 主页">
                 <GitHubIcon />
                 GitHub
-              </motion.a>
+              </a>
             </motion.div>
 
             <motion.div
-              className="metric-row hero-meta-grid"
+              className="metric-row"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.76, ease, delay: 0.32 }}
@@ -774,21 +669,8 @@ export default function Home() {
               <div><strong>{String(projects.length).padStart(2, "0")}</strong><span>项目方向</span></div>
               <div><strong>{String(featuredPapers.length + archivedPapers.length).padStart(2, "0")}</strong><span>论文记录</span></div>
             </motion.div>
-
-            <motion.div
-              className="motion-strip"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.76, ease, delay: 0.4 }}
-              aria-label="站点动效关键词"
-            >
-              <span>Command palette</span>
-              <span>Active nav</span>
-              <span>Project filter</span>
-              <span>Reduced-motion safe</span>
-            </motion.div>
           </div>
-          <FormulaPanel />
+          <SignalPanel />
         </section>
 
         <section id="about" className="content-section about-grid">
@@ -819,34 +701,23 @@ export default function Home() {
             <SectionTitle
               eyebrow="CAPABILITY"
               title="能力矩阵"
-              desc="用可复用的能力模块承接不同类型的项目，不只展示技术名词，也展示问题处理方式。"
+              desc="把研究、工程、界面和审美放在同一条表达线索里。"
             />
           </Reveal>
           <div className="skill-grid">
             {skills.map((skill, index) => (
               <Reveal delay={index * 0.05} key={skill.title}>
-                <motion.article className="glass-card skill-card" whileHover={{ y: -6 }} transition={{ duration: 0.24, ease }}>
+                <article className="glass-card skill-card">
                   <div className="card-index">0{index + 1}</div>
                   <h3>{skill.title}</h3>
                   <p>{skill.desc}</p>
                   <div aria-label={`${skill.title}关键词`}>
                     {skill.tags.map((tag) => <span key={tag}>{tag}</span>)}
                   </div>
-                </motion.article>
+                </article>
               </Reveal>
             ))}
           </div>
-        </section>
-
-        <section id="system" className="content-section system-section">
-          <Reveal>
-            <SectionTitle
-              eyebrow="UI SYSTEM"
-              title="界面体验系统"
-              desc="把风格、交互逻辑和 UI 层级重新组织：先建立信任，再引导探索，最后促成联系。"
-            />
-          </Reveal>
-          <InterfaceSystem />
         </section>
 
         <section id="projects" className="content-section">
@@ -854,7 +725,7 @@ export default function Home() {
             <SectionTitle
               eyebrow="PROJECTS"
               title="项目展示"
-              desc="加入项目筛选和更强的卡片反馈，让访客可以按目的快速浏览，而不是被动从上到下读完。"
+              desc="保留原有项目内容，用更清晰的筛选、状态和证据层级呈现。"
             />
           </Reveal>
           <ProjectShowcase />
@@ -876,7 +747,7 @@ export default function Home() {
             <SectionTitle
               eyebrow="METHOD"
               title="做事方式"
-              desc="把灵感变成可以验证、可以维护、可以复盘的结构。"
+              desc="先看清问题，再搭建结构，最后用反馈修正。"
             />
           </Reveal>
           <div className="method-grid">
@@ -891,17 +762,6 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
-        </section>
-
-        <section id="motion" className="content-section motion-lab-section">
-          <Reveal>
-            <SectionTitle
-              eyebrow="MOTION"
-              title="动效升级策略"
-              desc="把 Behance / Awwwards 常见的开场欢迎、滚动叙事、卡片反馈和快速跳转转译成适合个人站的轻量交互。"
-            />
-          </Reveal>
-          <MotionPrinciples />
         </section>
 
         <section className="content-section quote-band" aria-label="个人表达">
@@ -949,7 +809,7 @@ export default function Home() {
 
         <footer className="site-footer">
           <span>© {year} 马星煜</span>
-          <span>Built with Next.js · Logic in motion</span>
+          <span>Personal archive · Research · Code · Sound</span>
         </footer>
       </div>
     </main>
